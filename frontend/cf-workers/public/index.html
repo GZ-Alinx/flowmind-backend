@@ -1,0 +1,2247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OnePost — 写一次，AI 自动分发到全平台</title>
+  <meta name="description" content="一条内容，AI 10秒改写成小红书、Twitter、公众号、抖音文案。创作者和企业主的必备工具。">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --primary-light: #ede9fe;
+      --text: #111827;
+      --text-mid: #374151;
+      --text-light: #6b7280;
+      --bg: #fafafa;
+      --white: #ffffff;
+      --border: #e5e7eb;
+      --success: #10b981;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+    }
+
+    a { text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; }
+
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ===== NAV ===== */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-weight: 800;
+      font-size: 20px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-logo .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--primary), #a855f7);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 16px;
+    }
+
+    .nav-logo span {
+      background: linear-gradient(135deg, var(--primary), #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-links a {
+      color: var(--text-mid);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--primary); }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--primary);
+      border: 1.5px solid var(--primary);
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-outline:hover {
+      background: var(--primary-light);
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      padding: 148px 0 80px;
+      text-align: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 28px;
+    }
+
+    .hero-eyebrow .pulse {
+      width: 7px;
+      height: 7px;
+      background: var(--primary);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .hero h1 {
+      font-size: 60px;
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, var(--primary), #9333ea);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-sub {
+      font-size: 20px;
+      color: var(--text-mid);
+      max-width: 600px;
+      margin: 0 auto 36px;
+      line-height: 1.75;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+
+    .hero-note {
+      font-size: 13px;
+      color: var(--text-light);
+    }
+
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      margin-top: 56px;
+      padding-top: 48px;
+      border-top: 1px solid var(--border);
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--text-light);
+      margin-top: 2px;
+    }
+
+    /* ===== PLATFORMS ===== */
+    .platforms {
+      padding: 56px 0;
+      background: white;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .platforms-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .platforms-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .platform-logos {
+      display: flex;
+      gap: 36px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .platform-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-mid);
+    }
+
+    .platform-chip-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    /* ===== PAIN / SOLUTION ===== */
+    .contrast {
+      padding: 96px 0;
+    }
+
+    .contrast-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: start;
+    }
+
+    .contrast-block h2 {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    .contrast-block h2.pain { color: #ef4444; }
+    .contrast-block h2.solution { color: var(--success); }
+
+    .contrast-block .subtitle {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .contrast-block .desc {
+      font-size: 15px;
+      color: var(--text-light);
+      margin-bottom: 28px;
+      line-height: 1.7;
+    }
+
+    .item-list {
+      list-style: none;
+    }
+
+    .item-list li {
+      display: flex;
+      gap: 12px;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 15px;
+      align-items: flex-start;
+    }
+
+    .item-list li:last-child { border-bottom: none; }
+
+    .item-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .pain-item .item-icon { background: #fee2e2; color: #ef4444; }
+    .solution-item .item-icon { background: #dcfce7; color: var(--success); }
+
+    /* ===== HOW IT WORKS ===== */
+    .how {
+      padding: 96px 0;
+      background: white;
+    }
+
+    .section-center {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+    }
+
+    .section-sub {
+      font-size: 17px;
+      color: var(--text-light);
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      position: relative;
+    }
+
+    .step-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 28px;
+      text-align: center;
+    }
+
+    .step-num {
+      width: 44px;
+      height: 44px;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0 auto 20px;
+    }
+
+    .step-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .step-card p {
+      font-size: 14px;
+      color: var(--text-light);
+      line-height: 1.65;
+      margin-bottom: 16px;
+    }
+
+    .step-example {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 13px;
+      color: var(--text-mid);
+      font-family: 'SF Mono', monospace;
+      text-align: left;
+    }
+
+    .step-arrow {
+      position: absolute;
+      top: 50%;
+      width: calc(33.33% - 32px);
+      left: calc(16.67% + 16px);
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      color: var(--border);
+      font-size: 20px;
+      pointer-events: none;
+    }
+
+    .step-arrow:last-child {
+      display: none;
+    }
+
+    /* ===== OUTPUT PREVIEW ===== */
+    .output {
+      padding: 96px 0;
+    }
+
+    .output-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .output-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .output-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+    }
+
+    .output-card .card-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .output-card .platform-tag {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-light);
+    }
+
+    .output-card .card-body {
+      font-size: 13px;
+      color: var(--text-mid);
+      line-height: 1.65;
+    }
+
+    .output-card .highlight {
+      background: linear-gradient(135deg, var(--primary-light), #f3e8ff);
+      border-left: 3px solid var(--primary);
+      padding: 10px 12px;
+      border-radius: 0 8px 8px 0;
+      font-size: 13px;
+      color: var(--text);
+      margin-top: 10px;
+    }
+
+    /* ===== TESTIMONIALS ===== */
+    .testimonials {
+      padding: 80px 0;
+      background: #1f2937;
+      color: white;
+    }
+
+    .testimonials .section-label { color: #a5b4fc; }
+    .testimonials .section-title { color: white; }
+    .testimonials .section-sub { color: #9ca3af; }
+
+    .testi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 48px;
+    }
+
+    .testi-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 28px;
+    }
+
+    .testi-card .quote {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #e5e7eb;
+      margin-bottom: 20px;
+    }
+
+    .testi-card .author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .testi-card .avatar {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--primary), #9333ea);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .testi-card .name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .testi-card .role {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    /* ===== PRICING ===== */
+    .pricing {
+      padding: 96px 0;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .pricing-card {
+      background: white;
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      padding: 32px 28px;
+      position: relative;
+      transition: box-shadow 0.2s;
+    }
+
+    .pricing-card:hover {
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    }
+
+    .pricing-card.popular {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 1px var(--primary), 0 8px 32px rgba(99,102,241,0.15);
+    }
+
+    .popular-badge {
+      position: absolute;
+      top: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--primary), #9333ea);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 16px;
+      border-radius: 100px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .pricing-card h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .pricing-card .tier-desc {
+      font-size: 14px;
+      color: var(--text-light);
+      margin-bottom: 20px;
+    }
+
+    .price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 3px;
+      margin-bottom: 24px;
+    }
+
+    .price {
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .price-period {
+      font-size: 14px;
+      color: var(--text-light);
+    }
+
+    .pricing-features {
+      list-style: none;
+      margin-bottom: 28px;
+    }
+
+    .pricing-features li {
+      font-size: 14px;
+      padding: 9px 0;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      color: var(--text-mid);
+    }
+
+    .pricing-features li::before {
+      content: '✓';
+      color: var(--success);
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .btn-full {
+      width: 100%;
+      justify-content: center;
+      font-size: 15px;
+      padding: 13px 24px;
+    }
+
+    /* ===== FAQ ===== */
+    .faq {
+      padding: 96px 0;
+      background: white;
+    }
+
+    .faq-list {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .faq-item:last-child {
+      border-bottom: none;
+    }
+
+    .faq-q {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 20px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      text-align: left;
+      cursor: pointer;
+      gap: 16px;
+    }
+
+    .faq-q:hover { color: var(--primary); }
+
+    .faq-icon {
+      font-size: 20px;
+      color: var(--text-light);
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+
+    .faq-item.open .faq-icon {
+      transform: rotate(45deg);
+    }
+
+    .faq-a {
+      display: none;
+      padding-bottom: 20px;
+      font-size: 15px;
+      color: var(--text-light);
+      line-height: 1.75;
+    }
+
+    .faq-item.open .faq-a {
+      display: block;
+    }
+
+    /* ===== CTA ===== */
+    .cta-section {
+      padding: 100px 0;
+      background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+      text-align: center;
+      color: white;
+    }
+
+    .cta-section h2 {
+      font-size: 44px;
+      font-weight: 800;
+      margin-bottom: 14px;
+      letter-spacing: -0.02em;
+    }
+
+    .cta-section p {
+      font-size: 18px;
+      color: #9ca3af;
+      margin-bottom: 36px;
+    }
+
+    .cta-section .btn-primary {
+      font-size: 16px;
+      padding: 15px 36px;
+      background: white;
+      color: var(--text);
+    }
+
+    .cta-section .btn-primary:hover {
+      background: #f3f4f6;
+    }
+
+    .cta-note {
+      margin-top: 14px;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      padding: 36px 0;
+      border-top: 1px solid var(--border);
+      background: white;
+    }
+
+    footer .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    footer .logo {
+      font-weight: 800;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    footer .logo span {
+      background: linear-gradient(135deg, var(--primary), #9333ea);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    footer .copy {
+      font-size: 13px;
+      color: var(--text-light);
+    }
+
+    footer .links {
+      display: flex;
+      gap: 24px;
+    }
+
+    footer .links a {
+      color: var(--text-light);
+      text-decoration: none;
+      font-size: 13px;
+      transition: color 0.2s;
+    }
+
+    footer .links a:hover { color: var(--text); }
+
+    /* ===== MODAL ===== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 300;
+      padding: 24px;
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal {
+      background: white;
+      border-radius: 20px;
+      padding: 44px;
+      max-width: 460px;
+      width: 100%;
+      text-align: center;
+      animation: modalIn 0.2s ease;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-icon {
+      width: 56px;
+      height: 56px;
+      background: var(--primary-light);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin: 0 auto 20px;
+    }
+
+    .modal h3 {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .modal > p {
+      font-size: 15px;
+      color: var(--text-light);
+      margin-bottom: 28px;
+      line-height: 1.65;
+    }
+
+    .modal input[type="email"] {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 15px;
+      outline: none;
+      margin-bottom: 12px;
+      transition: border-color 0.2s;
+    }
+
+    .modal input[type="email"]:focus {
+      border-color: var(--primary);
+    }
+
+    .modal .btn-primary {
+      width: 100%;
+      justify-content: center;
+      font-size: 15px;
+      padding: 14px;
+    }
+
+    .modal-close {
+      display: block;
+      margin-top: 12px;
+      background: none;
+      border: none;
+      color: var(--text-light);
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .modal-close:hover { color: var(--text); }
+
+    .success-state {
+      display: none;
+    }
+
+    .success-state .big-check {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .success-state h4 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .success-state p {
+      font-size: 14px;
+      color: var(--text-light);
+      line-height: 1.65;
+    }
+
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 10px;
+    }
+
+    .demo-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 14px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 15px;
+      color: var(--text);
+      font-family: inherit;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .demo-textarea:focus { border-color: var(--primary); }
+
+    .demo-output-body .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1); }
+    }
+
+    /* ===== NOTIFICATION TOAST ===== */
+    .notification-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      max-width: 320px;
+      font-size: 13px;
+      color: var(--text-mid);
+      line-height: 1.5;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+
+    .notification-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .toast-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), #a855f7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .toast-text strong { color: var(--text); }
+    .toast-time { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+
+    /* ===== USE CASES ===== */
+    .use-cases {
+      padding: 96px 0;
+    }
+
+    .usecase-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      max-width: 860px;
+      margin: 48px auto 0;
+    }
+
+    .usecase-card {
+      display: flex;
+      gap: 16px;
+      padding: 24px;
+      background: white;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      transition: all 0.2s;
+    }
+
+    .usecase-card:hover {
+      border-color: var(--primary);
+      box-shadow: 0 4px 20px rgba(99,102,241,0.08);
+    }
+
+    .usecase-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .usecase-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .usecase-card p {
+      font-size: 13px;
+      color: var(--text-light);
+      line-height: 1.6;
+    }
+
+    /* ===== FEATURE COMPARISON ===== */
+    .comparison {
+      padding: 96px 0;
+      background: white;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .comparison-table-wrap {
+      max-width: 780px;
+      margin: 48px auto 0;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .comparison-table th {
+      padding: 16px 20px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      background: var(--bg);
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .comparison-table th:not(:first-child) {
+      text-align: center;
+    }
+
+    .comparison-table th .th-plan {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      text-transform: none;
+      letter-spacing: 0;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .comparison-table th .th-price {
+      font-size: 12px;
+      color: var(--text-light);
+      font-weight: 400;
+    }
+
+    .comparison-table td {
+      padding: 14px 20px;
+      font-size: 14px;
+      color: var(--text-mid);
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .comparison-table tr:last-child td { border-bottom: none; }
+
+    .comparison-table td:not(:first-child) {
+      text-align: center;
+    }
+
+    .comparison-table tr:hover td { background: var(--bg); }
+
+    .check-yes { color: var(--success); font-weight: 700; font-size: 16px; }
+    .check-no { color: #d1d5db; font-size: 16px; }
+
+    /* ===== TRUST BADGES ===== */
+    .trust-badges {
+      padding: 64px 0;
+    }
+
+    .trust-grid {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+      margin-top: 40px;
+    }
+
+    .trust-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      text-align: center;
+      max-width: 140px;
+    }
+
+    .trust-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .trust-item h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .trust-item p {
+      font-size: 12px;
+      color: var(--text-light);
+      line-height: 1.6;
+    }
+
+    /* ===== PRICING TOGGLE ===== */
+    .pricing-toggle-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 48px;
+    }
+
+    .pricing-toggle-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-light);
+      transition: color 0.2s;
+    }
+
+    .pricing-toggle-label.active { color: var(--text); }
+
+    .toggle-switch {
+      width: 48px;
+      height: 26px;
+      background: var(--border);
+      border-radius: 100px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .toggle-switch.annual { background: var(--primary); }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      top: 3px;
+      left: 3px;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+
+    .toggle-switch.annual::after {
+      transform: translateX(22px);
+    }
+
+    .save-badge {
+      background: #dcfce7;
+      color: var(--success);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 100px;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 36px; }
+      .hero-sub { font-size: 17px; }
+      .hero-stats { flex-direction: column; gap: 24px; }
+      .contrast-grid { grid-template-columns: 1fr; gap: 40px; }
+      .steps { grid-template-columns: 1fr; }
+      .step-arrow { display: none; }
+      .output-grid { grid-template-columns: 1fr; }
+      .testi-grid { grid-template-columns: 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; max-width: 400px; }
+      .nav-links { display: none; }
+      .section-title { font-size: 28px; }
+      .cta-section h2 { font-size: 30px; }
+      .usecase-grid { grid-template-columns: 1fr; }
+      .notification-toast { bottom: 12px; right: 12px; left: 12px; max-width: none; }
+      .comparison-table-wrap { overflow-x: auto; }
+    }
+  </style>
+  <style>
+
+    .topup-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+
+    /* Dashboard panel */
+
+    /* Payment modal */
+    .pay-method-btn.selected { border-color: var(--primary); background: var(--primary-light); }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-inner">
+      <div class="nav-logo">
+        <div class="logo-icon">⚡</div>
+        <span>OnePost</span>
+      </div>
+      <div class="nav-links">
+        <a href="#how" class="site-marketing">如何使用</a>
+        <a href="#output" class="site-marketing">效果预览</a>
+        <a href="#pricing" class="site-marketing">价格</a>
+        <a href="#faq" class="site-marketing">FAQ</a>
+        <button class="btn-primary" id="navCta" onclick="openModal()">登录 / 试用</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero site-marketing">
+    <div class="container">
+      <div class="hero-eyebrow">
+        <span class="pulse"></span>
+        正在内测 · 限量免费名额
+      </div>
+      <h1>写一次<br><span class="gradient">全平台发布</span></h1>
+      <p class="hero-sub">
+        扔进去一篇文章，AI 自动改写成小红书、Twitter/X、公众号、抖音、微博适配版本。<br>
+        不用再写 5 遍，效率提升 5 倍。
+      </p>
+      <div class="hero-actions">
+        <button class="btn-primary" id="heroCta" style="font-size:16px;padding:14px 30px;">
+          🚀 免费开始使用
+        </button>
+        <a href="#how" class="btn-outline" style="font-size:16px;padding:14px 30px;">
+          了解工作原理 →
+        </a>
+      </div>
+      <p class="hero-note">无需信用卡 · 10 秒上手 · 微信即可登录</p>
+
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-num">500+</div>
+          <div class="stat-label">内测用户正在使用</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">10s</div>
+          <div class="stat-label">平均改写耗时</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">5x</div>
+          <div class="stat-label">内容分发效率提升</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLATFORMS -->
+  <section class="platforms site-marketing">
+    <div class="container platforms-inner">
+      <div class="platforms-label">支持平台</div>
+      <div class="platform-logos">
+        <div class="platform-chip">
+          <div class="platform-chip-icon" style="background:#000;color:#fff;font-size:10px;">𝕏</div>
+          Twitter / X
+        </div>
+        <div class="platform-chip">
+          <div class="platform-chip-icon" style="background:#ff2442;color:#fff;font-size:10px;">红</div>
+          小红书
+        </div>
+        <div class="platform-chip">
+          <div class="platform-chip-icon" style="background:#07c160;color:#fff;font-size:10px;">微</div>
+          公众号
+        </div>
+        <div class="platform-chip">
+          <div class="platform-chip-icon" style="background:#000;color:#fff;font-size:10px;">＋</div>
+          抖音
+        </div>
+        <div class="platform-chip">
+          <div class="platform-chip-icon" style="background:#e6162d;color:#fff;font-size:10px;">微</div>
+          微博
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAIN VS SOLUTION -->
+  <section class="contrast site-marketing">
+    <div class="container">
+      <div class="contrast-grid">
+        <div class="contrast-block">
+          <h2 class="pain">❌ 内容分发的痛苦</h2>
+          <p class="subtitle">写完整篇文章，还要改 5 遍</p>
+          <p class="desc">每个平台有自己的风格、长度、格式要求。一篇内容来回改，比写一篇新的还累。</p>
+          <ul class="item-list">
+            <li class="pain-item">
+              <span class="item-icon">✕</span>
+              <span>小红书要 emoji + 分段 + 标签，公众号却要去掉</span>
+            </li>
+            <li class="pain-item">
+              <span class="item-icon">✕</span>
+              <span>Twitter 只有 280 字，要从 2000 字里提炼精华</span>
+            </li>
+            <li class="pain-item">
+              <span class="item-icon">✕</span>
+              <span>抖音要悬念式开头，公众号要完整的逻辑结构</span>
+            </li>
+            <li class="pain-item">
+              <span class="item-icon">✕</span>
+              <span>同时运营 5 个平台，每天花 3 小时在重复劳动上</span>
+            </li>
+          </ul>
+        </div>
+        <div class="contrast-block">
+          <h2 class="solution">✓ OnePost 的解决方案</h2>
+          <p class="subtitle">AI 帮你改，你只管发布</p>
+          <p class="desc">一次输入，AI 读懂你的内容，理解每个平台的用户偏好，输出平台适配版本。</p>
+          <ul class="item-list">
+            <li class="solution-item">
+              <span class="item-icon">✓</span>
+              <span>小红书：自动加 emoji、分段，匹配热门话题标签</span>
+            </li>
+            <li class="solution-item">
+              <span class="item-icon">✓</span>
+              <span>Twitter：提炼金句，生成有节奏感的 thread</span>
+            </li>
+            <li class="solution-item">
+              <span class="item-icon">✓</span>
+              <span>公众号：保留深度，加标题和引导语</span>
+            </li>
+            <li class="solution-item">
+              <span class="item-icon">✓</span>
+              <span>抖音：爆款文案结构，悬念开头 + 行动号召</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how site-marketing" id="how">
+    <div class="container">
+      <div class="section-center">
+        <p class="section-label">工作流</p>
+        <h2 class="section-title">3 步，完成全平台分发</h2>
+        <p class="section-sub">简单到不需要任何学习成本</p>
+      </div>
+
+      <div class="steps">
+        <div class="step-arrow">→</div>
+
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <h3>粘贴原始内容</h3>
+          <p>可以是公众号文章链接、直接粘贴文字，或者只是一个想法</p>
+          <div class="step-example">「独立开发者如何找到第一批用户」<br>—— 一篇 2000 字干货文章</div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <h3>选择目标平台</h3>
+          <p>勾选要发布的平台，点击生成，10 秒出结果</p>
+          <div class="step-example">☑ 小红书 &nbsp;☑ Twitter &nbsp;☑ 公众号<br>☑ 抖音 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;☑ 微博</div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <h3>复制发布</h3>
+          <p>每个平台的改写版本一键复制，去对应 App 粘贴发布</p>
+          <div class="step-example">✅ 小红书版已生成<br>✅ Twitter thread 已生成<br>✅ 公众号版已生成</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- USE CASES -->
+  <section class="use-cases site-marketing">
+    <div class="container">
+      <div class="section-center">
+        <p class="section-label">适用场景</p>
+        <h2 class="section-title">谁在用 OnePost？</h2>
+        <p class="section-sub">覆盖内容创作者和运营者的日常工作</p>
+      </div>
+
+      <div class="usecase-grid">
+        <div class="usecase-card">
+          <div class="usecase-icon" style="background:#fce7f3;">📸</div>
+          <div>
+            <h3>小红书博主</h3>
+            <p>同一篇干货，生成适合小红书风格的 emoji 分段笔记，附热门标签，直接发布</p>
+          </div>
+        </div>
+        <div class="usecase-card">
+          <div class="usecase-icon" style="background:#dbeafe;">✍️</div>
+          <div>
+            <h3>公众号运营者</h3>
+            <p>长文一键缩短，加标题加引导语，适配公众号阅读节奏，保持文章深度</p>
+          </div>
+        </div>
+        <div class="usecase-card">
+          <div class="usecase-icon" style="background:#dcfce7;">🚀</div>
+          <div>
+            <h3>独立开发者 / 创业者</h3>
+            <p>产品更新、博客文章快速分发到 Twitter/X、微博，让更多人知道你的产品</p>
+          </div>
+        </div>
+        <div class="usecase-card">
+          <div class="usecase-icon" style="background:#fef3c7;">🎬</div>
+          <div>
+            <h3>抖音 / 短视频创作者</h3>
+            <p>先把内容写成文字版，AI 提取爆款文案结构，为脚本创作提效</p>
+          </div>
+        </div>
+        <div class="usecase-card">
+          <div class="usecase-icon" style="background:#ede9fe;">🏢</div>
+          <div>
+            <h3>中小企业运营团队</h3>
+            <p>一个运营管 5 个平台不再是噩梦，AI 帮你维持稳定的发布节奏</p>
+          </div>
+        </div>
+        <div class="usecase-card">
+          <div class="usecase-icon" style="background:#fee2e2;">📱</div>
+          <div>
+            <h3>跨境内容创作者</h3>
+            <p>中文内容翻英文，英文内容翻中文，一键适配多语言内容分发需求</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OUTPUT PREVIEW -->
+  <section class="output site-marketing" id="output">
+    <div class="container">
+      <div class="output-header">
+        <p class="section-label">效果预览</p>
+        <h2 class="section-title">改写效果真实案例</h2>
+        <p class="section-sub">同一篇文章，不同平台的改写风格</p>
+      </div>
+
+      <div class="output-grid">
+        <div class="output-card">
+          <div class="card-top">
+            <div class="platform-chip-icon" style="background:#ff2442;color:#fff;font-size:10px;">红</div>
+            <span class="platform-tag">小红书</span>
+          </div>
+          <div class="card-body">
+            独立开发者必看！3 个方法找到第一批用户👇
+            <div class="highlight">
+              方法一：去目标用户出没的社区「钓鱼」<br><br>
+              不要在 v2ex 发帖了，去 Reddit、IndieHackers、Hacker News... 找真实用户在讨论什么问题，然后解决它。
+            </div>
+          </div>
+        </div>
+
+        <div class="output-card">
+          <div class="card-top">
+            <div class="platform-chip-icon" style="background:#000;color:#fff;font-size:10px;">𝕏</div>
+            <span class="platform-tag">Twitter / X</span>
+          </div>
+          <div class="card-body">
+            <div class="highlight">
+              1/ 如何不靠运气找到第一批用户？<br><br>
+              3 个我亲测有效的方法：
+              <br><br>
+              2/ 去用户所在的地方，不是你所在的地方<br><br>
+              3/ 提供价值先于索取<br><br>
+              4/ 让 10 个人爱上你，比 1000 个人知道你更有用
+            </div>
+          </div>
+        </div>
+
+        <div class="output-card">
+          <div class="card-top">
+            <div class="platform-chip-icon" style="background:#07c160;color:#fff;font-size:10px;">微</div>
+            <span class="platform-tag">公众号</span>
+          </div>
+          <div class="card-body">
+            <div class="highlight">
+              【精华】独立开发者获取种子用户的完整指南
+              <br><br>
+              这篇文章来自我和 30+ 独立开发者的访谈...
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials site-marketing">
+    <div class="container">
+      <div class="section-center">
+        <p class="section-label">用户怎么说</p>
+        <h2 class="section-title">已经在省时间的创作者</h2>
+        <p class="section-sub">真实内测用户反馈</p>
+      </div>
+
+      <div class="testi-grid">
+        <div class="testi-card">
+          <div class="quote">"以前发一篇文章要到 5 个平台，改到崩溃。现在只要 10 秒生成各个版本，复制粘贴就完了。每天省下 1 小时。"</div>
+          <div class="author">
+            <div class="avatar">陈</div>
+            <div>
+              <div class="name">陈海明</div>
+              <div class="role">独立开发者 /  newsletter 主理</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="quote">"我是做跨境电商的，小红书、抖音、微博都要运营。这个工具直接让我从每天 3 小时减到 40 分钟。"</div>
+          <div class="author">
+            <div class="avatar">林</div>
+            <div>
+              <div class="name">林小晴</div>
+              <div class="role">跨境电商创业者 / 10人团队</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="quote">"最打动我的是改出来的内容真的很懂平台调性，不是那种机器翻译感。Twitter thread 比我写的还舒服。"</div>
+          <div class="author">
+            <div class="avatar">张</div>
+            <div>
+              <div class="name">张维</div>
+              <div class="role">科技博主 / 全网 8 万粉丝</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARISON TABLE -->
+  <section class="comparison site-marketing">
+    <div class="container">
+      <div class="section-center">
+        <p class="section-label">功能对比</p>
+        <h2 class="section-title">各套餐能力一览</h2>
+        <p class="section-sub">按需选择，不需要的功能不用付费</p>
+      </div>
+
+      <div class="comparison-table-wrap">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>功能</th>
+              <th>
+                <span class="th-plan">Free</span>
+                <span class="th-price">¥0/月</span>
+              </th>
+              <th>
+                <span class="th-plan">个人 Pro</span>
+                <span class="th-price">¥19.9/月</span>
+              </th>
+              <th>
+                <span class="th-plan">团队</span>
+                <span class="th-price">¥88/月</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>每日改写次数</td>
+              <td>5 次</td>
+              <td>50 次</td>
+              <td>无限次</td>
+            </tr>
+            <tr>
+              <td>支持平台数</td>
+              <td>3 个</td>
+              <td>全部 5 个</td>
+              <td>全部 5 个</td>
+            </tr>
+            <tr>
+              <td>改写模板</td>
+              <td>基础模板</td>
+              <td>高级模板</td>
+              <td>自定义模板</td>
+            </tr>
+            <tr>
+              <td>历史记录</td>
+              <td>7 天</td>
+              <td>永久保存</td>
+              <td>永久保存</td>
+            </tr>
+            <tr>
+              <td>AI 响应优先级</td>
+              <td>普通</td>
+              <td>优先</td>
+              <td>最高优先</td>
+            </tr>
+            <tr>
+              <td>多账号协作</td>
+              <td>—</td>
+              <td>—</td>
+              <td>5 人共用</td>
+            </tr>
+            <tr>
+              <td>API 接口</td>
+              <td>—</td>
+              <td>—</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>专属客服</td>
+              <td>—</td>
+              <td>—</td>
+              <td>✓</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST BADGES -->
+  <section class="trust-badges site-marketing">
+    <div class="container">
+      <div class="section-center">
+        <p class="section-label">安心使用</p>
+        <h2 class="section-title">你关心的安全问题</h2>
+      </div>
+
+      <div class="trust-grid">
+        <div class="trust-item">
+          <div class="trust-icon">🔒</div>
+          <h4>数据加密</h4>
+          <p>所有数据传输采用 TLS 1.3 加密，数据静态加密存储</p>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">🚫</div>
+          <h4>不用于训练</h4>
+          <p>你的内容仅用于当次改写，绝不用于 AI 模型训练</p>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">⚡</div>
+          <h4>极速响应</h4>
+          <p>平均 10 秒生成 5 个平台改写版本，无需等待</p>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">💳</div>
+          <h4>安全支付</h4>
+          <p>Stripe/支付宝/微信支付官方渠道，资金由其统一结算</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing site-marketing" id="pricing">
+    <div class="container">
+      <div class="section-center">
+        <p class="section-label">价格</p>
+        <h2 class="section-title">简单透明，先用再付费</h2>
+        <p class="section-sub">有效果了再升级，不需要可以随时取消</p>
+      </div>
+
+      <div class="pricing-toggle-wrap">
+        <span class="pricing-toggle-label active" id="monthlyLabel">月付</span>
+        <div class="toggle-switch" id="pricingToggle"></div>
+        <span class="pricing-toggle-label" id="annualLabel">年付</span>
+        <span class="save-badge">省 20%</span>
+      </div>
+
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <h3>Free</h3>
+          <p class="tier-desc">先体验一下</p>
+          <div class="price-row">
+            <span class="price" data-monthly="¥0" data-annual="¥0">¥0</span>
+            <span class="price-period period">/月</span>
+          </div>
+          <ul class="pricing-features">
+            <li>每天 5 次改写</li>
+            <li>支持 3 个平台</li>
+            <li>基础改写模板</li>
+            <li>历史记录保存 7 天</li>
+          </ul>
+          <button class="btn-outline btn-full" onclick="openModal()">免费开始</button>
+        </div>
+
+        <div class="pricing-card popular">
+          <span class="popular-badge">最受欢迎</span>
+          <h3>个人 Pro</h3>
+          <p class="tier-desc">创作者必备</p>
+          <div class="price-row">
+            <span class="price" data-monthly="¥19.9" data-annual="¥11.58">¥19.9</span>
+            <span class="price-period period">/月</span>
+          </div>
+          <ul class="pricing-features">
+            <li>每天 50 次改写</li>
+            <li>全部 5 个平台</li>
+            <li>高级改写模板</li>
+            <li>优先 AI 响应</li>
+            <li>历史记录永久保存</li>
+          </ul>
+          <button class="btn-primary btn-full" onclick="openModal()">立即开通</button>
+        </div>
+
+        <div class="pricing-card">
+          <h3>团队</h3>
+          <p class="tier-desc">多人共用</p>
+          <div class="price-row">
+            <span class="price" data-monthly="¥88" data-annual="¥66.58">¥88</span>
+            <span class="price-period period">/月</span>
+          </div>
+          <ul class="pricing-features">
+            <li>无限次改写</li>
+            <li>全部 5 个平台</li>
+            <li>多成员协作</li>
+            <li>API 接口接入</li>
+            <li>专属客服支持</li>
+          </ul>
+          <button class="btn-outline btn-full" onclick="openModal()">立即开通</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq site-marketing" id="faq">
+    <div class="container">
+      <div class="section-center">
+        <p class="section-label">FAQ</p>
+        <h2 class="section-title">常见问题</h2>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-q">
+            <span>和直接用 ChatGPT 改写有什么区别？</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a">OnePost 专门针对每个平台的内容风格做了优化 Prompt，不需要你自己调教 ChatGPT。而且输入一次，直接出 5 个平台的改写版本，不用来回切换。</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">
+            <span>支持自动发布到这些平台吗？</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a">目前是半自动模式：AI 改写完成后，你一键复制，到各平台 App 粘贴发布。这样更安全，内容质量也由你把控。我们正在接入部分平台的官方 API，接入后会通知用户。</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">
+            <span>改写出来的内容是原创的吗？</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a">是的，OnePost 是对你的原始内容进行改写和适配，不是抄袭。改写后的内容保留你的核心观点，只是表达方式适配各平台。</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">
+            <span>我的内容会被用于训练 AI 吗？</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a">绝对不会。你的内容只用于当次改写，不会被保存也不会被用于任何 AI 训练。</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">
+            <span>支付安全吗？</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a">我们使用 Stripe 作为支付渠道，和支付宝/微信支付官方合作，资金由其统一结算，我们无法触碰。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section site-marketing">
+    <div class="container">
+      <h2>别再重复劳动了</h2>
+      <p>每天省下 2 小时，用在真正重要的事情上</p>
+      <button class="btn-primary" onclick="openModal()">🚀 免费开始使用</button>
+      <p class="cta-note">免费计划永久有效 · 随时可升级或取消</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="logo">⚡ <span>OnePost</span></div>
+      <div class="copy">© 2025 OnePost. All rights reserved.</div>
+      <div class="links">
+        <a href="#">隐私政策</a>
+        <a href="#">使用条款</a>
+        <a href="#">联系我们</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- NOTIFICATION TOAST -->
+  <div class="notification-toast" id="notificationToast">
+    <div class="toast-avatar" id="toastAvatar">李</div>
+    <div>
+      <div class="toast-text"><strong id="toastName">李先生</strong> 刚刚加入了内测</div>
+      <div class="toast-time" id="toastTime">3 分钟前</div>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modalBox">
+
+      <!-- LOGIN VIEW -->
+      <div class="modal-auth" id="viewLogin">
+        <div class="modal-icon">🔑</div>
+        <h3>登录账号</h3>
+        <p style="font-size:14px;color:var(--text-light);margin-bottom:20px;">登录后即可使用 AI 改写功能</p>
+        <input type="email" placeholder="邮箱" id="loginEmail" autocomplete="email" style="width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;outline:none;margin-bottom:10px;box-sizing:border-box;">
+        <input type="password" placeholder="密码" id="loginPassword" style="width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;outline:none;margin-bottom:10px;box-sizing:border-box;">
+        <div id="loginError" style="display:none;color:#ef4444;font-size:13px;margin-bottom:10px;text-align:left;"></div>
+        <button class="btn-primary" id="loginSubmitBtn" style="width:100%;justify-content:center;font-size:15px;padding:14px;margin-bottom:8px;">登录</button>
+        <div style="text-align:right;margin-bottom:16px;">
+          <button onclick="showView('forgot')" style="background:none;border:none;color:var(--primary);font-size:13px;cursor:pointer;">忘记密码？</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <div style="flex:1;height:1px;background:var(--border);"></div>
+          <span style="font-size:12px;color:var(--text-light);">或</span>
+          <div style="flex:1;height:1px;background:var(--border);"></div>
+        </div>
+        <button class="btn-outline" onclick="showView('register')" style="width:100%;justify-content:center;font-size:14px;padding:12px;margin-bottom:4px;">注册新账号</button>
+        <button class="modal-close" onclick="closeModal()">取消</button>
+      </div>
+
+      <!-- REGISTER VIEW -->
+      <div class="modal-auth" id="viewRegister" style="display:none;">
+        <div class="modal-icon">📝</div>
+        <h3>注册账号</h3>
+        <p style="font-size:14px;color:var(--text-light);margin-bottom:20px;">注册即送 ¥1.0 额度，立即体验</p>
+        <input type="email" placeholder="邮箱" id="regEmail" autocomplete="email" style="width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;outline:none;margin-bottom:10px;box-sizing:border-box;">
+        <input type="password" placeholder="密码（至少 6 位）" id="regPassword" style="width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;outline:none;margin-bottom:10px;box-sizing:border-box;">
+        <div id="regError" style="display:none;color:#ef4444;font-size:13px;margin-bottom:10px;text-align:left;"></div>
+        <button class="btn-primary" id="regSubmitBtn" style="width:100%;justify-content:center;font-size:15px;padding:14px;margin-bottom:10px;">注册</button>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <div style="flex:1;height:1px;background:var(--border);"></div>
+          <span style="font-size:12px;color:var(--text-light);">或</span>
+          <div style="flex:1;height:1px;background:var(--border);"></div>
+        </div>
+        <button onclick="showView('login')" style="width:100%;background:none;border:1px solid var(--border);border-radius:10px;font-size:14px;padding:12px;color:var(--text);cursor:pointer;margin-bottom:4px;">已有账号？登录</button>
+        <button class="modal-close" onclick="closeModal()">取消</button>
+      </div>
+
+      <!-- FORGOT PASSWORD VIEW -->
+      <div class="modal-auth" id="viewForgot" style="display:none;">
+        <div class="modal-icon">🔒</div>
+        <h3>重置密码</h3>
+        <p style="font-size:14px;color:var(--text-light);margin-bottom:20px;">输入注册邮箱，我们发送验证码</p>
+        <input type="email" placeholder="注册邮箱" id="forgotEmail" autocomplete="email" style="width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;outline:none;margin-bottom:10px;box-sizing:border-box;">
+        <div id="forgotError" style="display:none;color:#ef4444;font-size:13px;margin-bottom:10px;text-align:left;"></div>
+        <div id="forgotSuccess" style="display:none;color:var(--success);font-size:13px;margin-bottom:10px;text-align:left;"></div>
+        <button class="btn-primary" id="forgotSendBtn" onclick="sendResetCode()" style="width:100%;justify-content:center;font-size:15px;padding:14px;margin-bottom:10px;">发送验证码</button>
+        <div id="forgotCodeSection" style="display:none;margin-bottom:10px;">
+          <input type="text" placeholder="输入 6 位验证码" id="forgotCode" maxlength="6" style="width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;outline:none;margin-bottom:10px;box-sizing:border-box;letter-spacing:4px;text-align:center;">
+          <input type="password" placeholder="新密码（至少 6 位）" id="forgotNewPass" style="width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;outline:none;margin-bottom:10px;box-sizing:border-box;">
+          <button class="btn-primary" id="forgotResetBtn" onclick="submitResetPassword()" style="width:100%;justify-content:center;font-size:15px;padding:14px;">确认重置</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <div style="flex:1;height:1px;background:var(--border);"></div>
+          <span style="font-size:12px;color:var(--text-light);">或</span>
+          <div style="flex:1;height:1px;background:var(--border);"></div>
+        </div>
+        <button onclick="showView('login')" style="width:100%;background:none;border:1px solid var(--border);border-radius:10px;font-size:14px;padding:12px;color:var(--text);cursor:pointer;">返回登录</button>
+        <button class="modal-close" onclick="closeModal()">取消</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // ── AUTH ───────────────────────────────────────
+    var API_BASE = 'http://localhost:3001';
+    var AUTH_TOKEN_KEY='flowmind_token_v1';
+    var AUTH_USER_KEY='flowmind_user_v1';
+
+    function getToken() { return localStorage.getItem(AUTH_TOKEN_KEY); }
+    function getUser() {
+      try { return JSON.parse(localStorage.getItem(AUTH_USER_KEY) || '{}'); }
+      catch(e) { return {}; }
+    }
+    function setAuth(token, user) {
+      localStorage.setItem(AUTH_TOKEN_KEY, token);
+      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+    }
+    function clearAuth() {
+      localStorage.removeItem(AUTH_TOKEN_KEY);
+      localStorage.removeItem(AUTH_USER_KEY);
+    }
+
+    function openModal() {
+      document.getElementById('modalOverlay').classList.add('active');
+      showView('login');
+    }
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
+    }
+
+    // ── VIEW SWITCHING ─────────────────────────────
+    function showView(view) {
+      document.getElementById('viewLogin').style.display    = view === 'login'    ? 'block' : 'none';
+      document.getElementById('viewRegister').style.display  = view === 'register' ? 'block' : 'none';
+      document.getElementById('viewForgot').style.display    = view === 'forgot'   ? 'block' : 'none';
+      ['loginError','regError','forgotError'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+      if (view === 'forgot') {
+        document.getElementById('forgotCodeSection').style.display = 'none';
+        document.getElementById('forgotSuccess').style.display = 'none';
+        var sendBtn = document.getElementById('forgotSendBtn');
+        sendBtn.style.display = '';
+        sendBtn.textContent = '发送验证码';
+        sendBtn.disabled = false;
+      }
+      if (view === 'login') {
+        var el = document.getElementById('loginEmail');
+        if (el) { el.value = ''; el.focus(); }
+      }
+    }
+
+    // ── LOGIN ────────────────────────────────────
+    document.getElementById('loginSubmitBtn').addEventListener('click', async function() {
+      console.log('[DEBUG] Login clicked');
+      var email = document.getElementById('loginEmail').value.trim();
+      var password = document.getElementById('loginPassword').value;
+      var errEl = document.getElementById('loginError');
+      if (!email || !password) { errEl.textContent = '请填写邮箱和密码'; errEl.style.display = 'block'; return; }
+      errEl.style.display = 'none';
+      this.disabled = true;
+      this.textContent = '登录中...';
+      console.log('[DEBUG] Fetching login API');
+      try {
+        var resp = await fetch(API_BASE + '/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, password: password })
+        });
+        var data = await resp.json();
+        console.log('[DEBUG] Login response:', resp.status, data);
+        if (!resp.ok) throw new Error(data.error || '登录失败');
+        setAuth(data.token, data.user);
+        console.log('[DEBUG] Token set, navigating to dashboard');
+        closeModal();
+        window.location.href = 'dashboard.html';
+      } catch(err) {
+        console.error('[DEBUG] Login error:', err);
+        errEl.textContent = err.message;
+        errEl.style.display = 'block';
+      }
+      this.disabled = false;
+      this.textContent = '登录';
+    });
+
+    document.getElementById('loginPassword').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') document.getElementById('loginSubmitBtn').click();
+    });
+
+    // ── REGISTER ─────────────────────────────────
+    document.getElementById('regSubmitBtn').addEventListener('click', async function() {
+      var email = document.getElementById('regEmail').value.trim();
+      var password = document.getElementById('regPassword').value;
+      var errEl = document.getElementById('regError');
+      if (!email || !password) { errEl.textContent = '请填写邮箱和密码'; errEl.style.display = 'block'; return; }
+      if (!email.includes('@')) { errEl.textContent = '请输入有效邮箱'; errEl.style.display = 'block'; return; }
+      if (password.length < 6) { errEl.textContent = '密码至少 6 位'; errEl.style.display = 'block'; return; }
+      errEl.style.display = 'none';
+      this.disabled = true;
+      this.textContent = '注册中...';
+      try {
+        var resp = await fetch(API_BASE + '/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, password: password })
+        });
+        var data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || '注册失败');
+        setAuth(data.token, data.user);
+        closeModal();
+        window.location.href = 'dashboard.html';
+      } catch(err) {
+        errEl.textContent = err.message;
+        errEl.style.display = 'block';
+      }
+      this.disabled = false;
+      this.textContent = '注册';
+    });
+
+    document.getElementById('regPassword').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') document.getElementById('regSubmitBtn').click();
+    });
+
+    // ── FORGOT PASSWORD ───────────────────────────
+    var _forgotEmailForReset = '';
+
+    async function sendResetCode() {
+      var email = document.getElementById('forgotEmail').value.trim();
+      var errEl = document.getElementById('forgotError');
+      var succEl = document.getElementById('forgotSuccess');
+      if (!email || !email.includes('@')) { errEl.textContent = '请输入有效邮箱'; errEl.style.display = 'block'; return; }
+      errEl.style.display = 'none';
+      succEl.style.display = 'none';
+      var btn = document.getElementById('forgotSendBtn');
+      btn.disabled = true;
+      btn.textContent = '发送中...';
+      try {
+        var resp = await fetch(API_BASE + '/api/auth/send-reset-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email })
+        });
+        var data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || '发送失败');
+        _forgotEmailForReset = email;
+        if (data.code) {
+          succEl.textContent = 'Demo 模式：验证码为 ' + data.code + '（正式环境会发到邮箱）';
+        } else {
+          succEl.textContent = '验证码已发送到你的邮箱，请查收';
+        }
+        succEl.style.display = 'block';
+        btn.style.display = 'none';
+        document.getElementById('forgotCodeSection').style.display = 'block';
+        document.getElementById('forgotCode').focus();
+      } catch(err) {
+        errEl.textContent = err.message;
+        errEl.style.display = 'block';
+      }
+      btn.disabled = false;
+      btn.textContent = '发送验证码';
+    }
+
+    async function submitResetPassword() {
+      var code = document.getElementById('forgotCode').value.trim();
+      var newPass = document.getElementById('forgotNewPass').value;
+      var errEl = document.getElementById('forgotError');
+      var succEl = document.getElementById('forgotSuccess');
+      if (!code || code.length !== 6) { errEl.textContent = '请输入 6 位验证码'; errEl.style.display = 'block'; return; }
+      if (newPass.length < 6) { errEl.textContent = '新密码至少 6 位'; errEl.style.display = 'block'; return; }
+      errEl.style.display = 'none';
+      var btn = document.getElementById('forgotResetBtn');
+      btn.disabled = true;
+      btn.textContent = '重置中...';
+      try {
+        var resp = await fetch(API_BASE + '/api/auth/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: _forgotEmailForReset, code: code, newPassword: newPass })
+        });
+        var data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || '重置失败');
+        succEl.textContent = '密码重置成功，请使用新密码登录';
+        succEl.style.display = 'block';
+        document.getElementById('forgotCodeSection').style.display = 'none';
+        btn.textContent = '已重置';
+        setTimeout(function() { showView('login'); }, 1500);
+      } catch(err) {
+        errEl.textContent = err.message;
+        errEl.style.display = 'block';
+      }
+      btn.disabled = false;
+      btn.textContent = '确认重置';
+    }
+
+    document.getElementById('modalOverlay').addEventListener('click', function(e) {
+      if (e.target === document.getElementById('modalOverlay')) closeModal();
+    });
+
+    // ── HERO CTA ─────────────────────────────────
+    var heroCta = document.getElementById('heroCta');
+    if (heroCta) {
+      heroCta.addEventListener('click', function() {
+        if (getToken()) {
+          window.location.href = 'dashboard.html';
+        } else {
+          openModal();
+        }
+      });
+    }
+
+    // ── FAQ ACCORDION ───────────────────────────────
+    document.querySelectorAll('.faq-q').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var item = btn.parentElement;
+        var isOpen = item.classList.contains('open');
+        document.querySelectorAll('.faq-item').forEach(function(i) {
+          i.classList.remove('open');
+        });
+        if (!isOpen) item.classList.add('open');
+      });
+    });
+
+    // ── SMOOTH SCROLL ───────────────────────────────
+    document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+      a.addEventListener('click', function(e) {
+        var target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // ── PRICING TOGGLE ──────────────────────────────
+    (function() {
+      var toggle = document.getElementById('pricingToggle');
+      var monthlyLabel = document.getElementById('monthlyLabel');
+      var annualLabel = document.getElementById('annualLabel');
+      var isAnnual = false;
+
+      if (!toggle) return;
+
+      toggle.addEventListener('click', function() {
+        isAnnual = !isAnnual;
+        toggle.classList.toggle('annual', isAnnual);
+        monthlyLabel.classList.toggle('active', !isAnnual);
+        annualLabel.classList.toggle('active', isAnnual);
+
+        document.querySelectorAll('.pricing-card .price').forEach(function(el) {
+          el.textContent = isAnnual ? el.dataset.annual : el.dataset.monthly;
+        });
+        document.querySelectorAll('.pricing-card .period').forEach(function(el) {
+          el.textContent = isAnnual ? '/年' : '/月';
+        });
+      });
+    })();
+
+    // ── NOTIFICATION TOAST ─────────────────────────
+    (function() {
+      var names = ['王先生', '张女士', '李先生', '陈女士', '刘先生', '周女士', '吴先生', '赵女士'];
+      var provinces = ['北京', '上海', '深圳', '杭州', '广州', '成都', '南京', '武汉'];
+      var toast = document.getElementById('notificationToast');
+      var toastName = document.getElementById('toastName');
+      var toastAvatar = document.getElementById('toastAvatar');
+      var toastTime = document.getElementById('toastTime');
+      var shown = false;
+      var timers = [];
+
+      function showToast() {
+        var name = names[Math.floor(Math.random() * names.length)];
+        var province = provinces[Math.floor(Math.random() * provinces.length)];
+        toastName.textContent = name;
+        toastAvatar.textContent = name.charAt(0);
+        toastTime.textContent = province + ' · 刚刚';
+        toast.classList.add('show');
+
+        timers.push(setTimeout(function() {
+          toast.classList.remove('show');
+          timers.push(setTimeout(showToast, Math.random() * 12000 + 8000));
+        }, 5000));
+      }
+
+      // First toast after 12s, then every 15-30s
+      timers.push(setTimeout(showToast, 12000));
+
+      // Also show toast when user scrolls to bottom third of page
+      window.addEventListener('scroll', function() {
+        var docH = document.documentElement.scrollHeight;
+        var scrollY = window.scrollY + window.innerHeight;
+        if (scrollY > docH * 0.7 && !shown) {
+          shown = true;
+          timers.forEach(clearTimeout);
+          timers = [];
+          showToast();
+        }
+      });
+      timers.push(setTimeout(showToast, 12000));
+    })();
+  </script>
+
+</body>
+</html>

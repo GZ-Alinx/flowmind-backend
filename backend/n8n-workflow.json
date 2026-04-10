@@ -1,0 +1,119 @@
+{
+  "name": "OnePost - Multi-Platform Content Rewrite",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rewrite",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-input",
+      "name": "Webhook Input",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "onepost-rewrite"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds",
+              "seconds": 10
+            }
+          ]
+        }
+      },
+      "id": "delay-node",
+      "name": "Delay",
+      "type": "n8n-nodes-base.delay",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "operation": "complete",
+        "model": "claude-3-5-sonnet-20241022",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are a professional content adaptation AI. Given an original article, you will rewrite it for specific Chinese social media platforms. For each platform, you must preserve the core message while adapting tone, length, format, and style.\n\nPlatform rules:\n- 小红书 (Xiaohongshu/RED): Use emojis, divide into short paragraphs, add trending hashtags at the end, conversational and friendly tone, max 1000 chars\n- Twitter/X: Concise, punchy, use thread format with /1 /2 /3 numbering, max 280 chars per tweet, can be multiple tweets\n- 公众号 (WeChat Official Account): Formal but engaging, add title and intro, preserve depth, structured paragraphs, no emojis\n- 抖音 (Douyin/TikTok): Casual, attention-grabbing opening, use suspense, urgent call-to-action, very conversational, max 200 chars\n- 微博 (Weibo): Mix of Chinese and English allowed, trending hashtags, punchy sentences, conversational"
+        },
+        "prompt": {
+          "values": [
+            {
+              "name": "input",
+              "type": "string"
+            },
+            {
+              "name": "platform",
+              "type": "string"
+            }
+          ],
+          "string": "Original content: {{ $json.input }}\n\nTarget platform: {{ $json.platform }}\n\nPlease rewrite this content for the specified platform following the platform rules. Return ONLY the rewritten content, no explanations or prefixes."
+        },
+        "options": {
+          "maxTokens": 1000,
+          "temperature": 0.7
+        }
+      },
+      "id": "claude-rewrite",
+      "name": "Claude Rewrite",
+      "type": "@n8n/n8n-nodes-langchain.chatClaude",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect all rewritten content from Claude nodes\nconst platformResults = [];\n\nfor (let i = 0; i < $input.length; i++) {\n  const item = $input[i].json;\n  platformResults.push({\n    platform: item.platform,\n    content: item.content || item.message || JSON.stringify(item)\n  });\n}\n\nreturn platformResults.map(r => ({ json: r }));"
+      },
+      "id": "aggregate-results",
+      "name": "Aggregate Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Input": {
+      "main": [
+        [
+          {
+            "node": "delay-node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "delay-node": {
+      "main": [
+        [
+          {
+            "node": "claude-rewrite",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "claude-rewrite": {
+      "main": [
+        [
+          {
+            "node": "aggregate-results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

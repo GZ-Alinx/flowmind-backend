@@ -1,0 +1,17 @@
+name = "flowmind-api"
+main = "src/index.ts"
+compatibility_date = "2025-04-10"
+node_compat = true
+
+[[d1_databases]]
+binding = "DATABASE"
+database_name = "flowmind-db"
+database_id = "YOUR_DATABASE_ID_HERE"
+
+[vars]
+JWT_SECRET = "change-me-in-production"
+AI_MODEL = "deepseek-ai/DeepSeek-V3"
+
+# Workers 设置
+[vars]
+WORKERS_AI = "siliconflow"
