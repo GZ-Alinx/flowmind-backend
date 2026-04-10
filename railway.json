@@ -1,0 +1,12 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "NIXPACKS",
+    "nixpacksSetup": {
+      "install": "cd backend && npm install"
+    }
+  },
+  "deploy": {
+    "rootDirectory": "backend"
+  }
+}
