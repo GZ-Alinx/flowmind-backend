@@ -23,8 +23,8 @@ cd backend
 # 安装依赖
 npm install
 
-# 配置 API Key（需要 Anthropic API Key）
-export CLAUDE_API_KEY=sk-ant-...
+# 配置 API Key（需要 SiliconFlow API Key）
+export SILICONFLOW_API_KEY=your_key
 
 # 启动
 node server.js
@@ -87,7 +87,7 @@ flowmind-website/
 
 | 环境变量 | 说明 | 默认值 |
 |---------|------|--------|
-| `CLAUDE_API_KEY` | Anthropic API Key（必填） | - |
+| `SILICONFLOW_API_KEY` | SiliconFlow API Key（必填） | - |
 | `PORT` | API 服务端口 | `3001` |
 
 ---
