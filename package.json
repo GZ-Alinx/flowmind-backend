@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "cd backend && npm install",
-    "start": "cd backend && node server.js"
+    "build": "npm install",
+    "start": "node server.js"
   }
 }
