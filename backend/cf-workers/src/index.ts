@@ -175,34 +175,6 @@ async function rewriteWithSiliconFlow(content: string, platform: string, apiKey:
   return data.choices?.[0]?.message?.content || ''
 }
 
-// ── Static File Helper ────────────────────────────────────────────────────
-
-const HTML_CACHE = new Map<string, string>()
-const CSS_CACHE = new Map<string, string>()
-
-async function serveStatic(path: string, env: Env, contentType: string): Promise<Response> {
-  // Try D1 first, then built-in files
-  let content: string | null = null
-
-  if (contentType === 'text/html') {
-    if (HTML_CACHE.has(path)) {
-      return new Response(HTML_CACHE.get(path), {
-        headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=3600' }
-      })
-    }
-    const row = await env.DATABASE.prepare('SELECT content FROM static_files WHERE path = ? AND type = ?')
-      .bind(path, 'html').first<{ content: string }>()
-    if (row) {
-      HTML_CACHE.set(path, row.content)
-      return new Response(row.content, {
-        headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=3600' }
-      })
-    }
-  }
-
-  return new Response('Not Found', { status: 404 })
-}
-
 // ── App ───────────────────────────────────────────────────────────────────
 
 const app = new Hono<{ Bindings: Env }>()
@@ -219,18 +191,11 @@ app.use('/*', cors({
 // ── Static File Routes ────────────────────────────────────────────────────
 
 app.get('/', async (c) => {
-  const indexPath = '/index.html'
-  const row = await c.env.DATABASE.prepare('SELECT content FROM static_files WHERE path = ? AND type = ?')
-    .bind(indexPath, 'html').first<{ content: string }>()
-  if (row) return c.html(row.content)
-  return c.html('<h1>FlowMind API Running</h1><p>API docs coming soon.</p>')
+  return c.html('<h1>FlowMind API</h1><p>See <a href="/dashboard.html">Dashboard</a></p>')
 })
 
 app.get('/dashboard.html', async (c) => {
-  const row = await c.env.DATABASE.prepare('SELECT content FROM static_files WHERE path = ? AND type = ?')
-    .bind('/dashboard.html', 'html').first<{ content: string }>()
-  if (row) return c.html(row.content)
-  return c.html('<h1>Dashboard</h1><p>Not deployed yet.</p>')
+  return c.html('<h1>Dashboard</h1><p>Static files should be served via Cloudflare Pages. This Worker only serves the API.</p>')
 })
 
 app.get('/favicon.ico', (c) => c.text('', 204))
